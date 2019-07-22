@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 (http://www.altova.com) by Anne-Claire Kung (Roads & Traffic Authority NSW) -->
+<!---->
+<!--RTA TMDD wsdl file-->
+<!--Removed irrelevant messages according to RTA's TMDD -->
+<!--Date: 11-10-11-->
+<!--By: Doug Tran-->
+<!---->
+<definitions name="Sensor_v0.wsdl" 
+				targetNamespace="http://transport.nsw.gov.au/tmc/services/entity/devices/Sensor_v0"
+					xmlns="http://schemas.xmlsoap.org/wsdl/"
+					xmlns:tns="http://transport.nsw.gov.au/tmc/services/entity/devices/Sensor_v0"
+					xmlns:v0p1="http://transport.nsw.gov.au/tmc/services/entity/devices/Sensor_v0p1"
+					xmlns:header="http://transport.nsw.gov.au/tmc/schemas/software_component/SOAPHeader/v1"
+					xmlns:tmdd="http://www.tmdd.org/3/messages" xmlns:c2c="http://www.ntcip.org/c2c-message-administration"
+					xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+	<documentation>
+			Sensor Service - Version 0.1
+	</documentation>
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://transport.nsw.gov.au/tmc/services/entity/devices/Sensor_v0p1">
+			<xs:import namespace="http://www.tmdd.org/3/messages" schemaLocation="/Users/tvj/Downloads/xsd/TMDD.xsd"/>
+			<xs:import namespace="http://www.ntcip.org/c2c-message-administration" schemaLocation="/Users/tvj/Downloads/xsd/C2C.xsd"/>
+			<xs:import namespace="http://transport.nsw.gov.au/tmc/schemas/software_component/SOAPHeader/v1" schemaLocation="/Users/tvj/Downloads/xsd/SOAPHeader_v1.xsd"/>	
+			<!-- Definition of message types for the operations of the service in v0.1 -->			
+			<xs:element name="publishDetectorData">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="tmdd:detectorDataMsg" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="publishDetectorDataResponse">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="c2c:c2cMessageReceipt" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="errorReport">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="tmdd:errorReportMsg" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</types>
+	
+	<message name="publishDetectorData">
+		<part name="message" element="v0p1:publishDetectorData"/>
+		<part name="header" element="header:MsgContext" />
+	</message>
+	<message name="publishDetectorDataResponse">
+		<part name="message" element="v0p1:publishDetectorDataResponse"/>
+		<part name="header" element="header:MsgContext" />
+	</message>
+	<message name="errorReport">
+		<part name="message" element="v0p1:errorReport"/>
+	</message>
+
+	<portType name="SensorPortType_v0p1">
+		<!-- DETECTOR -->
+		<operation name="publishDetectorData">
+			<documentation>
+				<objectClass>Detector</objectClass>
+				<msgPattern>Pub</msgPattern>
+				<requirement>REQ421</requirement>
+			</documentation>
+			<input message="tns:publishDetectorData"/>
+			<output message="tns:publishDetectorDataResponse"/>
+			<fault name="errorReport" message="tns:errorReport"/>
+		</operation>
+	</portType>
+	<binding name="SensorSoapHttpBinding_v0p1" type="tns:SensorPortType_v0p1">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<!-- DETECTOR -->
+		<operation name="publishDetectorData">
+			<soap:operation soapAction="urn:PegaRULES:SOAP:Sensor:Services#PublishDetectorData" style="document"/>
+			<input>
+				<soap:header message="tns:publishDetectorData" part="header" use="literal" />
+				<soap:body parts="message" use="literal"/>
+			</input>
+			<output>
+				<soap:header message="tns:publishDetectorDataResponse" part="header" use="literal" />
+				<soap:body parts="message" use="literal"/>
+			</output>
+			<fault name="errorReport">
+				<soap:fault name="errorReport" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+	<service name="Sensor_v0p1">
+		<port name="SensorSoapHttpPort" binding="tns:SensorSoapHttpBinding_v0p1">
+			<soap:address location="http://tmdd.owner.center.com/c2cxml/"/>
+		</port>
+	</service>
+</definitions>
